@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Analytical {% endblock %}
+{% block content %}
+<div class="container-fluid options">
+  <!-- Django filter: BY YEAR AND constituency -->
+  <h3>HEALTH PERFORMANCE IN THE COUNTY</h3>
+</div>
+<div class="row">
+  <!-- SIMPLE ANALYSIS -->
+  <div class="col-md-4">
+    <!-- bar graph -->
+    <div class="card">
+      <div class="card-header">
+        Featured
+      </div>
+      <div class="card-body">
+        <div class="" id="bar_graph">
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Line graph -->
+    <div class="card">
+      <div class="card-header">
+        Featured
+      </div>
+      <div class="card-body">
+        <div class="line_graph" id="line_graph">
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <!-- OTHERS -->
+  <div class="col-md-4">
+    <!-- Line graph -->
+    <div class="card">
+      <div class="card-header">
+        Featured
+      </div>
+      <div class="card-body">
+        <div class="" id="line_graph2">
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Area graph -->
+    <div class="card">
+      <div class="card-header">
+        Featured
+      </div>
+      <div class="card-body">
+        <div class="area_graph">
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BALANCE SHEET -->
+  <div class="col-md-4">
+    <!-- Sectioned -->
+  </div>
+</div>
+<div class="row">
+
+</div>
+{% endblock %}
+{% block javascript %}
+  <script src="{% static 'js/dash.js' %}"></script>
+{% endblock %}
+<!-- VISUALIZATION IN YEARS, CANCER TYPE, FOLLOW UP, -->

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load leaflet_tags %}
+{% load static %}
+{% block title %} Home {% endblock %}
+{% block content %}
+<div class="container-fluid options">
+  <div class="row">
+    <div class="col-md-4 text-center">
+      <h4 class="" id="c_name">Leukemia</h4>
+    </div>
+    <!-- <div class="col-md-4">
+      <select class="form-control " name="">
+        <option value="">Count</option>
+        <option value="">Sum</option>
+        <option value="">Mean</option>
+      </select>
+    </div> -->
+  </div>
+</div>
+
+<div class="row">
+  <div class="map col-md-7 " id="map">
+      {% leaflet_map "map" callback="window.map_init" %}
+  </div>
+
+  <div class="col-md-5 stat">
+    <div class="pie" id="pie">
+
+    </div>
+    <div class="bar" id="bar">
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block javascript %}
+  <script src="{% static 'js/main.js' %}"></script>
+{% endblock %}

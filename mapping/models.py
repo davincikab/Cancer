@@ -1,5 +1,4 @@
-from django.contrib.gis.db import models as geo_models
-from django.db import models
+from django.contrib.gis.db import models
 from django.contrib.postgres.fields import JSONField
 from django.contrib.auth.models import User
 
@@ -15,7 +14,7 @@ class County(models.Model):
     throat = JSONField(blank=False, null=False)
     prostate = JSONField(blank=False, null=False)
     total = models.IntegerField(blank=False, null=False)
-    geom = geo_models.MultiPolygonField(blank=False, null=False)
+    geom = models.MultiPolygonField(blank=False, null=False)
     breast = JSONField(blank=False, null=False)
 
     class Meta:
@@ -24,76 +23,76 @@ class County(models.Model):
 
 class CareGiver(models.Model):
 	user = models.ForeignKey(User, on_delete = models.CASCADE)
-	phone_number = models.CharField(max_length = 12, blank = False)
-    
+	phone_number = models.CharField(max_length = 15, blank = False)
+
 	def __str__(self):
 	  return self.user.username
 
 class Patient(models.Model):
-	status_choice = (
-	   ('M','Medication'),
-	   ('T','Breach')
-	)
+    status_choice = (
+        ('M','Medication'),
+        ('T','Breach')
+        )
 
-	referral_choice = (
-	   ('HS','Hospital'),
-	   ('DR','Doctor'),
-	   ('S','Self')
-	)
+    referral_choice = (
+        ('HS','Hospital'),
+        ('DR','Doctor'),
+        ('S','Self')
+        )
 
-	death_choice = (
-	   ('HM','Home'),
-	   ('HS','Hospital')
-	)
+    death_choice = (
+        ('HM','Home'),
+        ('HS','Hospital')
+        )
 
-	cancer_stage = (
-	 (1,'Stage 1'),
-	 (2,'Stage 2'),
-	 (3,'Stage 3'),
-	 (4,'Stage 4'),
-	)
+    cancer_stage = (
+        (1,'Stage 1'),
+        (2,'Stage 2'),
+        (3,'Stage 3'),
+        (4,'Stage 4'),
+        )
 
-	cancer_choices = (
-	  ('B','Breat'),
-	  ('C','Cervix'),
-	  ('O','Oesophagus'),
-	  ('P','Prostate'),
-	  ('R','Rectum'),
-	  ('L','Lung'),
-	  ('OT','Others'),
-	)
+    cancer_choices = (
+        ('B','Breast'),
+        ('C','Cervix'),
+        ('O','Oesophagus'),
+        ('P','Prostate'),
+        ('R','Rectum'),
+        ('L','Lung'),
+        ('OT','Others'),
+        )
 
-	gender_choice =(
-	 ('M','Male'),
-	 ('F','Female'),
-	)
+    # gender_choice =(
+    #     ('M','Male'),
+    #     ('F','Female'),
+    #     )
+
+    gid = models.AutoField(primary_key=True)
+    location = models.CharField(max_length=254, blank=True, null=True)
+    cancer_typ = models.CharField(max_length=254, blank=True, null=True)
+    year = models.BigIntegerField(blank=True, null=True)
+    const_nam = models.CharField(max_length=50, blank=True, null=True)
+    county_nam = models.CharField(max_length=50, blank=True, null=True)
+    nhif = models.CharField(max_length=254, blank=True, null=True)
+    gender = models.CharField(max_length = 30)
+    cancer_sta = models.BigIntegerField(blank=True, null=True)
+    age = models.BigIntegerField(blank=True, null=True)
+    status = models.CharField(max_length = 3, choices=status_choice)
+    home_visit = models.BigIntegerField(blank=True, null=True)
+    referral = models.CharField(max_length = 3, choices=referral_choice)
+    chemothera = models.BigIntegerField(blank=True, null=True)
+    events = models.BigIntegerField(blank=True, null=True)
+    firstvisit = models.CharField(max_length=254, blank=True, null=True)
+    drug = models.CharField(max_length=254, blank=True, null=True)
+    phone_numb = models.CharField(max_length=100, blank=True, null=True)
+    geom = models.PointField(blank=True, null=True)
 
 
-	user = models.ForeignKey(User, on_delete = models.CASCADE)
-	status = models.CharField(max_length = 3, choices=status_choice)
-	referral = models.CharField(max_length = 3, choices=referral_choice)
-	gender = models.CharField(max_length = 3, choices=gender_choice)
-	age = models.IntegerField(blank=False)
-	cancer_type = models.CharField(max_length = 3, choices=cancer_choices)
-	cancer_stage = models.PositiveSmallIntegerField(choices = cancer_stage)
-	firstvisit = models.BooleanField(default=False)
-	date = models.DateField(blank=False)
-	chemotherapy = models.IntegerField(default = 0)
-	numberofvisit = models.IntegerField(default=0, blank=False) #Home Visit
-	nhif_number = models.CharField(max_length = 15, blank = False)
-	location = geo_models.PointField(srid=4326)
-	address = models.CharField(max_length = 30, blank=False )
-	phone_number = models.CharField(max_length = 15,blank = True)
-	under_care_of = models.ManyToManyField(CareGiver)
-
-	def distance_to_user(self):
-	  return route_distance
-
-	def new_patients(self):
-	   pass
-
-	def __str__(self):
-	  return self.user.username
+    class Meta:
+        managed = False
+        db_table = 'patient'
+    def __str__(self):
+        return self.gid + 'Patient'
 
 class DoctorProfile(models.Model):
     user = models.ForeignKey(User, on_delete = models.CASCADE)

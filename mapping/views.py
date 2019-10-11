@@ -1,42 +1,108 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from .models import County
+from .models import County, Patient
 from django.core.serializers import serialize
 from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.measure import D
 from django.contrib.gis.db.models.functions import AsGeoJSON, Centroid, Area
+from .filters import PatientFilter
+from django.db.models import Count
+from django.contrib.gis.db.models import Extent, Union,Collect
+import json
 
 # Create your views here.
 def home(request):
     return render(request, 'index.html')
+
+def dashboard(request):
+    return render(request, 'dashboard.html')
 
 def const_data(request):
     const = serialize('geojson',County.objects.all())
 
     return HttpResponse(const)
 
-def constituency_centroid(request):
-    const_centroids = County.objects.annotate(geometry = AsGeoJSON(Centroid('geom')))
+def patient_data(request):
+    patient = Patient.objects.all()
+    patient_filter = PatientFilter(request.GET, queryset = patient)
+    patient = serialize('geojson',patient_filter.qs)
 
-    const_json = serialize('geojson',
-                            County.objects.annotate(geometry = Centroid('geom')),
-                            fields=('throat','lukemia', 'const_nam','cervical')
-                            )
-    da = const_centroids[0].geometry
-    # for i in range(len(const_centroids)):
-    #     data = dict(const_centroids[i].geometry)
-    #     coord = data['coordinates']
-    #     const_json.features[i].geometry = coord
+    # redire
+    return HttpResponse(patient)
 
-    return HttpResponse(da['type'])
+def search(request):
+    patient = Patient.objects.values('const_nam','year')\
+            .annotate(Cancer_type = Count('cancer_typ'))\
+            .filter(year=2015)\
+            .order_by('-Cancer_type')
+
+    context = {'map_data':patient}
+
+    return render(request, 'data.html',context)
+
 
 def get_summary_stats(request):
-    # Sum, avg per county and year
-    return HttpResponse()
-def dashboard(request):
-    return render(request, 'dashboard.html')
+    patient = [p for p in Patient.objects.values('const_nam','year')\
+            .annotate(Cancer_type = Count('cancer_typ'))\
+            .filter(year=2015)\
+            .order_by('-Cancer_type')]
+
+    patient_nhif =[p for p in Patient.objects.values('nhif','year')\
+                .annotate(Nhif = Count('cancer_typ'))\
+                .order_by('year')]
+
+    patient_year = [ p for p in Patient.objects.values('year')\
+            .annotate(Cancer_type = Count('cancer_typ')) ]
+            # .order_by('-Cancer_type')
+
+    response = {'patient':patient,'patient_year':patient_year,'nhif':patient_nhif}
+    print(response)
+    return HttpResponse(json.dumps(response))
+
+def spatial_search(request):
+    distance = request.GET.get('distance')
+    pnt = GEOSGeometry('POINT(36.935971 -0.425414)', srid=4326)
+    patient_within = Patient.objects.filter(geom__distance_lte=(pnt, D(km=float(distance))))
+
+    return HttpResponse(serialize('geojson',patient_within))
+
+
 """
 Working with multindex data: update, analyse
 Routing, Hospitals.
 Diet and medication
 add pie, bar, line graphs
+output = dict()
+subcounty = ['Kieni','Mathira','Nyeri Town','Tetu','Othaya']
+for sub in subcounty:
+    patient = Patient.objects.filter(const_nam =sub).aggregate(Count('cancer_typ'))
+    output[sub] = patient['cancer_typ__count']
+    print ('{}: {}'.format(sub, patient['cancer_typ__count']))
+# patient_filter = PatientFilter(request.GET, queryset = patient)
+# 'data':patient_filter,
+context = {'map_data':output}
+
+"""
+"""
+patient = Patient.objects.values('const_nam','year')\
+        .annotate(Cancer_type = Count('cancer_typ'))\
+        .filter(year=2015)\
+        .order_by('-Cancer_type')
+
+"""
+
+"""
+import geopandas as gpd
+import pandas as pd
+
+polys = gpd.read_file(county)
+points = gpd.read_file(patient)
+
+dfsjoin = gpd.sjoin(polys,points) #Spatial join Points to polygons
+dfpivot = pd.pivot_table(dfsjoin,index='PolyID',columns='Food',aggfunc={'Food':len})
+
+dfpivot.columns = dfpivot.columns.droplevel()
+
+dfpolynew = polys.merge(dfpivot, how='left',on='PolyID')
+
 """

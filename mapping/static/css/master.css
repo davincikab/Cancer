@@ -1,19 +1,24 @@
 body{
   margin: 0;
   padding: 0;
-  font-family: 'Georgia', serif;
+  font-family: 'Times', serif;
   font-size: 0.9em;
 }
 .navbar{
-  background:purple;
+  border-bottom: 1.5px solid;
+  background-color:#FFFFFF;
+  padding:1%;
 }
 
 .navbar a{
-  color: white;
-  font-style: italic;
-  font-size: 1.3em;
-}
+  color:#00000090;
+  /* font-style: italic; */
+  font-size: 1.4em;
 
+}
+.navbar .navbar-brand{
+  font-size: 2em;
+}
 .dropdown-menu{
   background: purple;
 }
@@ -39,8 +44,11 @@ body{
 }
 
 .map{
-  height:85vh;
+  height:82vh;
   width:100%;
+}
+.stat{
+  height:82vh;
 }
 
 .pie, .bar{
@@ -79,9 +87,17 @@ body{
     width: 100%;
 	}
 
-.col-md-6{
+/* .col-md-6{
   padding: 2%;
+} */
+.leaflet-routing-container, .leaflet-routing-error {
+    width:200px;
+    background-color: white;
+    padding-top: 4px;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
 }
+
 .hr-light{
   background: white;
   border: 2px solid;
@@ -103,12 +119,11 @@ body{
   overflow: hidden;
 }
 
-#search,
-.filterBySoilCategory,
-#select{
+#search,.filterBySoilCategory,#select{
   margin: 0;
   height: 2em;
 }
+
 ul .ui-autocomplete{
   height:auto;
   color:purple !important;
@@ -139,4 +154,41 @@ ul .ui-autocomplete{
 hr{
   margin-top:2px;
   margin-bottom: 2px;
+}
+
+#stat {
+    margin:0;
+
+}
+.query-form{
+  border-top:1px solid black;
+}
+.fa{
+  opacity: 1;
+}
+/* .data{
+  display: none
+} */
+#nhif_graph{
+  height:40vh;
+}
+
+.card{
+  width:100%;
+  background-color: #f2f2f2;
+  color:blue;
+  margin-bottom: 2px;
+  border-bottom:1px solid rgba(0, 0, 0, 0.125);
+  text-align: center;
+}
+
+.number{
+  font-family: 'Times' sans-serif;
+  font-size:3em;
+  text-align: center;
+  color:purple
+}
+
+.table_analyst{
+    height:45vh;
 }

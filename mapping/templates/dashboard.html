@@ -2,17 +2,105 @@
 {% load static %}
 {% block title %} Dashboard {% endblock %}
 {% block content %}
-<div class="container-fluid text-center options">
+<!-- <div class="container-fluid text-center options"> -->
   <!-- Django filter -->
-  <h3 class="">GENERAL DASHBOARD</h3>
-</div>
 <div class="row">
-  <div class="col-md-8" id="area_g">
+  <div class="col-md-2 " id="summary_data">
+    <div class="row" id="image">
+      <div class="card my-1">
+        <img src="{% static 'images/dennis-kummer.jpg'%}" alt="ribbon" width="100%" height="150vh">
+      </div>
+    </div>
 
+    <div class="row my-0" id="patient_count">
+      <div class="card ">
+        <h1 class="text-center number">200</h1>
+        <p class="bold">Total Patients</p>
+      </div>
+    </div>
+
+    <div class="row" id="patient_avg">
+      <div class="card mt-2 py-2">
+        <h1 class="text-center number">130</h1>
+        <p class="bold">Patients Under Medication</p>
+      </div>
+    </div>
+
+    <div class="row" id="patient_treat">
+      <div class="card mt-2">
+        <h1 class="text-l number">70</h1>
+        <p class="bold">Patients Under Breach</p>
+      </div>
+    </div>
+    <div class="row" id="patient_treat">
+      <div class="card mt-2">
+        <h1 class="text-l number">200</h1>
+        <p class="bold">Total Patients</p>
+      </div>
+
+    </div>
   </div>
-  <div class="col-md-4" id="smap">
-    <!-- properties: color schemes, ramps ... -->
+  <div class="col-md-10" >
+    <div class="row" id="nhif_graph">
+
+    </div>
+    <div class="row" id="data_table">
+      <div class="col-md-6">
+        <div class="card table_analyst py-1">
+          <h6>Cancer Type by Mode of Payment</h6>
+          <table class="table table-responsive">
+            <tr>
+              <th>Cancer Type</th>
+              <th>NHIF Card</th>
+              <th>Medicare</th>
+            </tr>
+            <tr>
+              <td>Prostate</td>
+              <td>20</td>
+              <td>10</td>
+            </tr>
+            <tr>
+              <td>Breast</td>
+              <td>20</td>
+              <td>10</td>
+            </tr>
+            <tr>
+              <td>Cervical</td>
+              <td>20</td>
+              <td>10</td>
+            </tr>
+            <tr>
+              <td>Others</td>
+              <td>20</td>
+              <td>10</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card table_analyst py-2" id="bhorizontal">
+
+          <div class="row">
+
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
+</div>
+
+<div class="row mt-3">
+
+    <div class="col-md-6" id="area_g">
+
+    </div>
+    <div class="col-md-6" id="smap">
+
+    </div>
+
+
 </div>
 <div class="row">
   <div class="col-md-6">
@@ -26,10 +114,11 @@
     <!-- Pie chart with a legend -->
   </div>
 </div>
+
 {% endblock %}
 {% block javascript %}
   <script src="{% static 'js/series-label.js' %}"></script>
   <script src="{% static 'js/exporting.js' %}"></script>
-  <script src="{% static 'js/dash.js' %}"></script>
+  <script src="{% static 'js/dashboard.js' %}"></script>
 {% endblock %}
 <!-- VISUALIZATION IN YEARS, CANCER TYPE, FOLLOW UP, -->

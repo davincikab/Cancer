@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load leaflet_tags %}
+
+{% block title %} Home {% endblock %}
+{% block content %}
+
+    {{ map_data }}
+<!-- {% regroup map_data by const_nam as data_list %}
+<ul>
+  {% for dt in datalist %}
+    <li>{{ dt.grouper }}</li>
+    <ul>
+      {% for datum in dt.list %}
+        <li>{{ datum.year }}</li>
+        <li>{{ datum.type }}</li>
+      {% endfor %}
+    </ul>
+  {% endfor %}
+</ul> -->
+
+
+{% endblock %}

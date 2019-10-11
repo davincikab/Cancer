@@ -1,39 +1,67 @@
 {% extends 'base.html' %}
-{% load leaflet_tags %}
 {% load static %}
+{% load leaflet_tags %}
+
 {% block title %} Home {% endblock %}
 {% block content %}
 <div class="container-fluid options">
   <div class="row">
-    <div class="col-md-4 text-center">
-      <h4 class="" id="c_name">Leukemia</h4>
-    </div>
-    <!-- <div class="col-md-4">
-      <select class="form-control " name="">
-        <option value="">Count</option>
-        <option value="">Sum</option>
-        <option value="">Mean</option>
-      </select>
-    </div> -->
+    <form class="form-inline" action="" method="get" id="filter-data">
+      <!-- {% csrf_token %} -->
+      <div class="input-group">
+        <label for="">Year</label>
+          <input type="number" name="year" step="any" id="id_year">
+      </div>
+      <div class="input-group">
+        <label for="">Cancer</label>
+        <input type="text" name="cancer_typ" id="id_cancer_typ">
+      </div>
+      <!-- <div class="input-group">
+        <label for="">Gender</label>
+       <select name="gender" id="id_gender">
+          <option value="" selected>---------</option>
+          <option value="M">Male</option>
+          <option value="F">Female</option>
+        </select>
+      </div> -->
+      <div class="input-group">
+        <label for="">Age</label>
+          <input type="number" name="age" step="any" id="id_age">
+      </div>
+      <!-- <div class="input-group">
+        <label for="">NHIF</label>
+          <input type="text" name="nhif" id="id_nhif">
+      </div> -->
+      <div class="input-group ml-2">
+          <input type="submit" name="submit" value="Submit" class="btn btn-sm btn-info">
+      </div>
+    </form>
   </div>
 </div>
 
 <div class="row">
-  <div class="map col-md-7 " id="map">
+  <div class="col-md-2 query-form">
+    <form class="form-horizontal mt-2" action="" method="get" id="spatial_search">
+
+      <div class="input-group">
+        <input type="number" class="form-control" name="distance" value="" placeholder="Dist in Km">
+      </div>
+      <div class="input-group mt-2">
+        <input type="submit" name="submit" value="Query" class="form-control">
+      </div>
+    </form>
+  </div>
+  <div class="map col-md-9 " id="map">
       {% leaflet_map "map" callback="window.map_init" %}
   </div>
 
-  <div class="col-md-5 stat">
-    <div class="pie" id="pie">
-
-    </div>
-    <div class="bar" id="bar">
-
-    </div>
+  <div class="col-md-1 stat" id="stat">
   </div>
 </div>
 
 {% endblock %}
 {% block javascript %}
+  <script type="text/javascript" src="{% static 'js/leaflet-routing-machine.js' %}"></script>
+  <script src="{% static 'js/Control.Geocoder.js' %}"></script>
   <script src="{% static 'js/main.js' %}"></script>
 {% endblock %}

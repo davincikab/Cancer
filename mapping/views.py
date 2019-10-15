@@ -31,9 +31,9 @@ def patient_data(request):
     return HttpResponse(patient)
 
 def search(request):
-    patient = Patient.objects.values('const_nam','year')\
+    # year = request.GET.get('year')
+    patient = Patient.objects.values('nhif','cancer_typ')\
             .annotate(Cancer_type = Count('cancer_typ'))\
-            .filter(year=2015)\
             .order_by('-Cancer_type')
 
     context = {'map_data':patient}
@@ -42,9 +42,21 @@ def search(request):
 
 
 def get_summary_stats(request):
+    # year = request.GET.get('year')
+
+    patient_all =  [p for p in Patient.objects.values('status')\
+            .annotate(Cancer_type = Count('status'))\
+            # .filter(year=year)\
+            .order_by('-Cancer_type')]
+
+    patient_cancer =  [p for p in Patient.objects.values('cancer_typ','year')\
+            .annotate(Cancer_type = Count('cancer_typ'))\
+            # .filter(year=year)\
+            .order_by('-Cancer_type')]
+
     patient = [p for p in Patient.objects.values('const_nam','year')\
             .annotate(Cancer_type = Count('cancer_typ'))\
-            .filter(year=2015)\
+            # .filter(year=year)\
             .order_by('-Cancer_type')]
 
     patient_nhif =[p for p in Patient.objects.values('nhif','year')\
@@ -55,14 +67,18 @@ def get_summary_stats(request):
             .annotate(Cancer_type = Count('cancer_typ')) ]
             # .order_by('-Cancer_type')
 
-    response = {'patient':patient,'patient_year':patient_year,'nhif':patient_nhif}
-    print(response)
+    response = {'patient_all':patient_all,'patient':patient,'patient_year':patient_year,'nhif':patient_nhif}
+    #print(response)
     return HttpResponse(json.dumps(response))
 
 def spatial_search(request):
     distance = request.GET.get('distance')
     pnt = GEOSGeometry('POINT(36.935971 -0.425414)', srid=4326)
-    patient_within = Patient.objects.filter(geom__distance_lte=(pnt, D(km=float(distance))))
+
+    if distance  != '':
+        patient_within = Patient.objects.filter(geom__distance_lte=(pnt, D(km=float(distance))))
+    else:
+        patient_within = Patient.objects.all()
 
     return HttpResponse(serialize('geojson',patient_within))
 
@@ -77,7 +93,7 @@ subcounty = ['Kieni','Mathira','Nyeri Town','Tetu','Othaya']
 for sub in subcounty:
     patient = Patient.objects.filter(const_nam =sub).aggregate(Count('cancer_typ'))
     output[sub] = patient['cancer_typ__count']
-    print ('{}: {}'.format(sub, patient['cancer_typ__count']))
+    #print ('{}: {}'.format(sub, patient['cancer_typ__count']))
 # patient_filter = PatientFilter(request.GET, queryset = patient)
 # 'data':patient_filter,
 context = {'map_data':output}

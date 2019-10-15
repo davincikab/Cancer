@@ -11,15 +11,28 @@ $(function(){
   $.get('http://127.0.0.1:8000/summary/')
     .done(function(res){
       let json = JSON.parse(res);
+      updateDataValue(json['patient_all']);
       data_nhif_compare(json['nhif']);
 
       plot(json['patient_year']);
       let data = clean_data(json['patient_year']);
 
     }).
+
     fail(function (jqxhr,settings,ex){
       console.log(ex);
     });
+
+function updateDataValue(data){
+   let data_v = $('#summary_data').find('h1');
+
+   let values = [data.map(a => a.Cancer_type).reduce((a,b) => a+b ),data[0].Cancer_type,data[1].Cancer_type, 200];
+
+
+   for (var i in values) {
+    $(data_v[i]).text(values[i]);
+   }
+}
 
 function data_nhif_compare(data){
 
@@ -40,7 +53,9 @@ function plot_nhif(data){
   // Column plots
   Highcharts.chart('nhif_graph', {
       chart: {
-          type: 'column'
+          backgroundColor: '#ffffff',
+          type: 'column',
+
       },
       title: {
           text: 'Patient with NHIF vs Patients without NHIF card'
@@ -76,6 +91,7 @@ function plot_nhif(data){
   function plot(carea_list){
           Highcharts.chart('bhorizontal', {
           chart: {
+              backgroundColor: '#ffffff',
               type: 'bar'
           },
           title: {
@@ -107,6 +123,7 @@ function plot_nhif(data){
         // Column plots
       Highcharts.chart('area_g', {
           chart: {
+              backgroundColor:'#ffffff',
               type: 'column'
           },
           title: {
@@ -134,7 +151,7 @@ function plot_nhif(data){
               column: {
                   pointPadding: 0.2,
                   borderWidth: 0,
-                  color:'pink'
+                  color:'#D346B1'
               }
           },
           series: [{
@@ -145,6 +162,7 @@ function plot_nhif(data){
 
       Highcharts.chart('smap', {
          chart: {
+              backgroundColor:'#ffffff',
               type: 'line'
           },
           title: {

@@ -27,7 +27,7 @@
     <title>{% block title %}{% endblock %}</title>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg ">
+    <nav class="navbar navbar-expand-lg bg-light">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">
           <!-- <img src="{% static 'images/kalro.JPG' %}" width="30" height="30" class="d-inline-block align-top" alt=""> -->
@@ -55,17 +55,17 @@
           <ul class="navbar-nav mr-auto">
             {% if user.is_authenticated %}
               <li class="nav-item">
-                <a class="nav-link" href="#">Logout</a>
+                <a class="nav-link" href="{% url 'logout'%}">Logout</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Profile</a>
+                <a class="nav-link" href="{% url 'profile'%}">Profile</a>
               </li>
             {% else %}
               <li class="nav-item">
-                <a class="nav-link" href="#">Sign Up</a>
+                <a class="nav-link" href="{% url 'register'%}">Sign Up</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="#">Log In</a>
+                <a class="nav-link" href="{% url 'login'%}">Log In</a>
               </li>
              {% endif %}
           </ul>
@@ -80,10 +80,10 @@
         </div>
       {% endfor %}
     {% endif %}
-    {% block content %}
-    {% endblock %}
-
-
+    <div class="container-fluid bg-light">
+      {% block content %}
+      {% endblock %}
+    </div>
     <!-- Optional JavaScript -->
 
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

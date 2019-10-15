@@ -3,7 +3,7 @@ from .models import *
 
 class PatientAdmin(admin.ModelAdmin):
     list_display = ['cancer_typ','gender','age','year']
-    ordering = ['year']
+    ordering = ['-year']
 
 class EventsAdmin(admin.ModelAdmin):
     list_display = ['name','venue', 'type']

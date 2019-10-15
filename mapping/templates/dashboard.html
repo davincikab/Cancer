@@ -4,7 +4,7 @@
 {% block content %}
 <!-- <div class="container-fluid text-center options"> -->
   <!-- Django filter -->
-<div class="row">
+<div class="row bg-light">
   <div class="col-md-2 " id="summary_data">
     <div class="row" id="image">
       <div class="card my-1">
@@ -14,41 +14,45 @@
 
     <div class="row my-0" id="patient_count">
       <div class="card ">
-        <h1 class="text-center number">200</h1>
+        <h1 class="text-center number"></h1>
         <p class="bold">Total Patients</p>
       </div>
     </div>
 
     <div class="row" id="patient_avg">
       <div class="card mt-2 py-2">
-        <h1 class="text-center number">130</h1>
+        <h1 class="text-center number"></h1>
         <p class="bold">Patients Under Medication</p>
       </div>
     </div>
 
     <div class="row" id="patient_treat">
       <div class="card mt-2">
-        <h1 class="text-l number">70</h1>
+        <h1 class="text-l number"></h1>
         <p class="bold">Patients Under Breach</p>
       </div>
     </div>
     <div class="row" id="patient_treat">
       <div class="card mt-2">
-        <h1 class="text-l number">200</h1>
+        <h1 class="text-l number"></h1>
         <p class="bold">Total Patients</p>
       </div>
 
     </div>
   </div>
   <div class="col-md-10" >
-    <div class="row" id="nhif_graph">
+    <!-- <form class="form-horizontal" action="" method="get">
+      {% csrf_token %}
+      <input type="number" name="year" value="" placeholder="Year">
+    </form> -->
+    <div class="row bg-light mb-2" id="nhif_graph">
 
     </div>
     <div class="row" id="data_table">
-      <div class="col-md-6">
+      <div class="col-md-6 ">
         <div class="card table_analyst py-1">
           <h6>Cancer Type by Mode of Payment</h6>
-          <table class="table table-responsive">
+          <table class="table table-responsive container ml-5 mt-2">
             <tr>
               <th>Cancer Type</th>
               <th>NHIF Card</th>

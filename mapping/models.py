@@ -21,6 +21,39 @@ class County(models.Model):
         managed = False
         db_table = 'county'
 
+class Drugs(models.Model):
+    cancer_stage = (
+	 (1,'Stage 1'),
+	 (2,'Stage 2'),
+	 (3,'Stage 3'),
+	 (4,'Stage 4'),
+	)
+
+    name = models.CharField(max_length=30, blank=False)
+    stage = models.PositiveSmallIntegerField(choices=cancer_stage)
+    hospital = models.CharField(max_length=150)
+
+    def __str__(self):
+        return self.name
+
+class Events(models.Model):
+    event_choices = (
+    ('S','Seminars'),
+    ('A','Awareness Campaign')
+    )
+
+    id = models.AutoField( primary_key=True)
+    name = models.TextField()
+    date = models.DateTimeField()
+    venue = models.CharField(max_length=30, blank = True)
+    type = models.CharField(max_length=2, choices= event_choices)
+
+    class Meta:
+        db_table = 'mapping_events'
+
+    def __str__(self):
+        return self.name
+
 class CareGiver(models.Model):
 	user = models.ForeignKey(User, on_delete = models.CASCADE)
 	phone_number = models.CharField(max_length = 15, blank = False)
@@ -66,6 +99,7 @@ class Patient(models.Model):
     #     ('M','Male'),
     #     ('F','Female'),
     #     )
+    # NHIF number
 
     gid = models.AutoField(primary_key=True)
     location = models.CharField(max_length=254, blank=True, null=True)
@@ -81,9 +115,7 @@ class Patient(models.Model):
     home_visit = models.BigIntegerField(blank=True, null=True)
     referral = models.CharField(max_length = 3, choices=referral_choice)
     chemothera = models.BigIntegerField(blank=True, null=True)
-    events = models.BigIntegerField(blank=True, null=True)
-    firstvisit = models.CharField(max_length=254, blank=True, null=True)
-    drug = models.CharField(max_length=254, blank=True, null=True)
+    firstvisit = models.DateField(blank=True, null=True)
     phone_numb = models.CharField(max_length=100, blank=True, null=True)
     geom = models.PointField(blank=True, null=True)
 
@@ -91,8 +123,9 @@ class Patient(models.Model):
     class Meta:
         managed = False
         db_table = 'patient'
+
     def __str__(self):
-        return self.gid + 'Patient'
+        return self.location
 
 class DoctorProfile(models.Model):
     user = models.ForeignKey(User, on_delete = models.CASCADE)
@@ -102,34 +135,6 @@ class DoctorProfile(models.Model):
     def __str__(self):
         return self.user.username
 
-class Events(models.Model):
-	event_choices = (
-	  ('S','Seminars'),
-	  ('A','Awareness Campaign')
-	)
-
-	name = models.TextField()
-	date = models.DateTimeField()
-	venue = models.CharField(max_length=30, blank=False)
-	type = models.CharField(max_length = 2,choices=event_choices)
-
-	def __str__(self):
-	  return self.name
-
-class Drugs(models.Model):
-    cancer_stage = (
-	 (1,'Stage 1'),
-	 (2,'Stage 2'),
-	 (3,'Stage 3'),
-	 (4,'Stage 4'),
-	)
-
-    name = models.CharField(max_length=30, blank=False)
-    stage = models.PositiveSmallIntegerField(choices=cancer_stage)
-    hospital = models.CharField(max_length=150)
-
-    def __str__(self):
-        return self.name
 
 	#Drugs according to cancer stage: table join on field stage
 class Diet(models.Model):

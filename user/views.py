@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect
-from .forms import UserRegistrationForm
+from .forms import UserRegistrationForm, UserUpdateForm, ProfileForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 """
 
 Determine the nature of request
 Validate the data
-Save the user 
+Save the user
 Message
 Redirect
 
@@ -28,4 +28,6 @@ def register(request):
 
 @login_required
 def profile(request):
-	return render(request, 'user/profile.html')
+	print(request.user.userprofile.profession)
+	form = ProfileForm(instance = request.user.userprofile)
+	return render(request, 'user/profile.html',{'form':form})

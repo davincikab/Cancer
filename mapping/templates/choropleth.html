@@ -40,7 +40,7 @@
 </div>
 
 <div class="row">
-  <div class="col-md-2 query-form">
+  <!-- <div class="col-md-0 query-form">
     <form class="form-horizontal mt-2" action="" method="get" id="spatial_search">
 
       <div class="input-group">
@@ -50,16 +50,18 @@
         <input type="submit" name="submit" value="Query" class="form-control">
       </div>
     </form>
-    <!-- choropleth -->
-    <div class="container-fluid my-2" id="output">
-    </div>
-    <a href="{% url 'choropleth'%}">Choropleth Map</a>
-  </div>
-  <div class="map col-md-9 " id="map">
+  </div> -->
+  <div class="map col-md-8 " id="map">
       {% leaflet_map "map" callback="window.map_init" %}
   </div>
 
-  <div class="col-md-1 stat" id="stat">
+  <div class="col-md-4 stat" id="stat">
+    <div class="" id="pie">
+
+    </div>
+    <div class="" id="bar">
+
+    </div>
   </div>
 </div>
 
@@ -67,6 +69,5 @@
 {% block javascript %}
   <script type="text/javascript" src="{% static 'js/leaflet-routing-machine.js' %}"></script>
   <script src="{% static 'js/Control.Geocoder.js' %}"></script>
-  <script src="{% static 'js/turf.min.js' %}"></script>
-  <script src="{% static 'js/main.js' %}"></script>
+  <script src="{% static 'js/changed.js' %}"></script>
 {% endblock %}

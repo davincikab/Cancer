@@ -150,21 +150,6 @@ function map_init(map, options){
 
     }
 
-// ============================== Heatmap =========================================
-    var pots = [];
-
-    var town = L.geoJson(patient,{
-          pointToLayer:function(feature,latlng){
-          pots.push(latlng);
-        return L.marker(latlng,{});
-      }});
-
-     var theat = L.heatLayer(pots,{
-             radius:25,
-             blur:15,
-             gradient:{0.4: 'red', 0.65: 'red', 1: 'red'}
-           }).addTo(map);
-
 // ===================================== Consituency Layer =======================================================
     function createLegendData(data){
       let legenddiv = document.getElementById('stat');
@@ -180,7 +165,7 @@ function map_init(map, options){
 
   // style the map according to the cases reported
   function onEachFeature(feature, layer){
-
+    layer.bindPopup(feature.properties.const_nam);
   }
 
   function myStyle(feature){
@@ -208,30 +193,291 @@ function map_init(map, options){
 
       }
 
+      var layer_dem = L.tileLayer.wms('http://localhost:8090/geoserver/Cancer/wms?',{
+        layers: 'Cancer:geotiff_coverage',
+        transparent: true,
+        opacity:0.9
+      });
+
+      var theat = L.tileLayer.wms('http://localhost:8090/geoserver/Cancer/wms?',{
+        layers: 'Cancer:heatLayer',
+        transparent: true,
+        opacity:0.7
+
+      });
+
+
       let overlays = {'Patients':markercluster,'Heatmap':theat};
-      let baselayer = {'Consituency':const_data};
+      let baselayer = {"DEM":layer_dem,'Consituency':const_data};
 
       L.control.layers(baselayer,overlays).addTo(map);
-
+      var hospice = L.marker([-0.425414, 36.935971],{
+        icon: L.icon({
+            iconUrl:'/static/images/hospital-symbol.png',
+            iconSize: [38, 43],
+            iconAnchor: [22, 43],
+            popupAnchor: [-3, -36],
+          })
+      }).bindPopup("Nyeri Hospice Hospital").addTo(map);
 
       // function route(target){
             var router = L.Routing.control({
               waypoints:[
-                   L.latLng(-0.425414, 36.935971),
+                   L.latLng(-0.455414, 36.935971),
                    L.latLng(-0.458732,37.123175)
               ],
                 routeWhileDragging:true,
                 geocoder: L.Control.Geocoder.nominatim(),
                 showAlternatives:true,
                 altLineOptions:true,
+                show:false,
+                collapsible:true,
+                createMarker: function(i, wp) {
+          				var options = {
+          						draggable: this.draggableWaypoints,
+
+          					},
+          				    marker = L.marker(wp.latLng, options);
+
+          				return marker;
+          			},
                 router: L.Routing.mapbox('pk.eyJ1IjoiZGF1ZGk5NyIsImEiOiJjanJtY3B1bjYwZ3F2NGFvOXZ1a29iMmp6In0.9ZdvuGInodgDk7cv-KlujA')
              });
 
              map.addControl(router);
+             // L.Routing.errorControl(router).addTo(map);
+             // Implement reverse geocoding
+             // Patient within drive timeout
+             // Autocorrelation
 
-             L.Routing.errorControl(router).addTo(map);
+             console.log(router);
       // }
 
+      // ============================================= DRIVE TIME DATA =======================================
+          var isochrone;
+           isochrone = L.geoJson(null,{
+             style:function(feature){
+               return{
+                 fillColor:groupStyle(feature.properties.value),
+                 fillOpacity:0.7,
+                 weight:0.0
+               }
+             },
+             onEachFeature:function(feature,layer){
+               // console.log(feature.properties);
+               layer.bindPopup(feature.properties.area);
+             },
+             filter:function(feature){
+               return true;
+             }
+           }).addTo(map);
+
+           overlays['Isochrone'] = isochrone;
+           function groupStyle(value){
+             // determine the number of drive times and color them accordingly
+             let colors = ['#F87774','#F7CB73','#C7E843','#74F370'];
+             return value <= 300?'#74f370':value <= 600?'#C7E843':value <= 900?'#F7CB73':'#F87774';
+           }
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 18
+            }).addTo(map);
+
+
+            function driveTime(url,body_url){
+              let request = new XMLHttpRequest();
+
+              request.open('POST', url);
+
+              request.setRequestHeader('Accept', 'application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8');
+              request.setRequestHeader('Content-Type', 'application/json');
+              request.setRequestHeader('Authorization', '5b3ce3597851110001cf6248de42a0f46acb4c3f82a7dc3dbd69fa61');
+
+              request.onreadystatechange = function () {
+                if (this.readyState === 4) {
+                  console.log('Status:', this.status);
+                  console.log('Headers:', this.getAllResponseHeaders());
+                  // console.log('Body:', this.responseText);
+                  editDriveTime(JSON.parse(this.responseText)); //catch the error and notify the user: Network connection
+                }
+              };
+
+              const body = body_url;
+
+              request.send(body);
+            }
+
+
+            function editDriveTime(data){
+              isochrone.clearLayers();
+              //  var difference=[];
+              //  for (i=0;i<(data.features.length-1); i++){
+              //       console.log(i);
+              //       difference.push(turf.difference(data.features[i+1],data.features[i]));
+              // }
+              //
+              // difference.push(data.features[0]);
+              // data.features = difference.filter(layer => layer != null);
+              data = data.features.reverse();
+              isochrone.addData(data);
+              map.fitBounds(isochrone.getBounds());
+              findPatientWithin();
+            }
+
+            // driveTime();
+            function geolocate(){
+              let location;
+              map.on('locationfound', function(e){
+                L.circleMarker(e.latlng,{radius:10,fillColor:'blue',fillOpacity:0.4}).addTo(map);
+                location = e.latlng;
+              });
+
+              map.on('locationerror', function(e){
+                let alert = $('<div></div>').attr({
+                  "class":'alert alert-danger',
+                  "role":"alert",
+                }).text("Could not determine your location");
+                document.body.append(alert);
+              });
+
+
+              map.locate({setView:true});
+              return location;
+            }
+
+            function updaterDriveTime(values){
+              console.log(values);
+                let url = `https://api.openrouteservice.org/v2/isochrones/${values[1].value}`;
+
+                let user_location = geolocate();
+                if(user_location == undefined){
+                  user_location = [36.949853897094734,-0.41970831301551276];
+                }else{
+                  user_location = [user_location.lat,user_location.lng];
+                }
+                let location = `{"locations":[[${user_location}]],"range":[${values.filter(k=> k.name == "time").map(a=>a.value)*60}],"attributes":["area"],"intersections":"true","interval":300}`;
+
+                driveTime(url,location);
+                console.log(location);
+            }
+
+            function findPatientWithin(){
+              // call driveTime(location,time, mode_trans);
+              // find all: isochrone.contains(patient);
+              let patient = patients.toGeoJSON();
+              let bounds = isochrone.toGeoJSON().features;
+
+              for (let bound of bounds){
+                let patientwithin = turf.pointsWithinPolygon(patient, bound);
+                bound.properties['count'] = patientwithin.features.length
+             }
+
+              // Isochrone results control
+              document.getElementById('output').innerHTML = "";
+              let result = $('<table>').attr({
+                "class":'table table responsive table-bordered',
+                "role":"table",
+              });
+              result.append("<tr><th>Range</th><th>Patient</th></tr>");
+              // <th>Area</th>  <td>${feature.properties.area}</td>
+              for(let feature of bounds){
+                result.append(`<tr><td>${feature.properties.value/60} min</td> <td>${feature.properties.count}</td></tr>`);
+              }
+
+              $('#output').append(result);
+              console.log(bounds.map(feature=> feature.properties.count));
+            }
+
+            var drive_time_control = L.control({position:'topleft'});
+            drive_time_control.onAdd = function(map){
+              let div = L.DomUtil.create("div",'reachability-control-settings-container route-container');
+              $(div).append(
+                $("<span></span>").attr({
+                "class":"reachability-control-settings-button fa fa-bullseye fa-1x",
+                "title":`Hide Reachability Option`,
+                "role":"button",
+                "aria-label":`Hide Reachability Option`,
+                })
+              );
+
+              let form = L.DomUtil.create("form",'form-horizontal route-form');
+              $(form).attr({
+                "method":'get',
+                "action":".",
+                "role":"form"
+              });
+
+              let range_type = ['distance','time']; //mode
+              let trans_option = ['driving-car',"cycling-road",'foot-walking']; //Tooltip
+              let trans_icon = ['fa fa-car','fa fa-bicycle','fa fa-male'];
+              let intervals = [5,10,15,20,25,30];
+
+
+              let select_mode = L.DomUtil.create('select','reachability-control-range-list form-control mb-2');
+              $(select_mode).attr({
+                "name":"range_type"
+              });
+
+              $(form).append($('<span></span>').text("Mode: "));
+              for (let rc in range_type) {
+                $(select_mode).append(
+                  $('<option></option>').attr({"value":`${range_type[rc]}`})
+                  .text(range_type[rc])
+                );
+              }
+              $(form).append(select_mode);
+
+
+              let select_trans = L.DomUtil.create('select','reachability-control-range-list form-control mb-2');
+              $(select_trans).attr({
+                "name":"profile"
+              });
+              $(form).append($('<span></span>').text("Trans: "));
+
+              for (let to in trans_option) {
+                $(select_trans).append($('<option></option>').attr({"value":`${trans_option[to]}`}).text(trans_option[to]));
+              }
+
+              $(form).append(select_trans);
+
+              let select_control = L.DomUtil.create('select','reachability-control-range-list');
+              $(select_control).attr({
+                "name":"time"
+              });
+              $(form).append(
+                $("<span></span>").attr({
+                  'class':'reachability-control-range-title'
+                }).text("Time "));
+
+              for (let interval of intervals) {
+                $(select_control).append($('<option></option>').attr({"value":`${interval}`}).text(interval +" min"));
+              }
+
+              form.append(select_control);
+              form.innerHTML += " <span><input type='checkbox' name='interval'>  interval</span>";
+              form.innerHTML += "<input type='submit' name='submit' class='form-control btn-success' value='Generate Drive'>";
+
+              $(div).append(form);
+              $(div).on('mouseover', function(e){
+                $(this).css({"height":"auto","width":"auto","padding":"6px"}).find(".reachability-control-settings-button").hide();
+                $(form).css({"display":"block"});
+                e.stopPropagation(e);
+              });
+
+              $(div).on('mouseout', function(e){
+                $(this).css({"height":"35px","width":"35px","padding":"0px"}).find(".reachability-control-settings-button").show();
+                $(form).css({"display":"none"});
+                e.stopPropagation(e);
+              });
+
+              $(form).on('submit',function(e){ e.preventDefault();
+              updaterDriveTime($(form).serializeArray());
+
+              });
+              return div;
+            }
+
+            drive_time_control.addTo(map);
 }
 
 function  processData(data){
@@ -343,3 +589,14 @@ function plot(carea_list){
 //                             "<i style='margin-left:-2px; color:white 'class= 'fa fa-tint fa-inverse'></i>"+
 //                              "</div>"+
 //                  "<p style='position: relative; top: -20px; display: inline-block; ' >"+data[i] +"</p>";
+
+
+
+// Populatio pyramids
+// Change hospital markers
+// Cancer per year: filter.
+// Choropleth map to generalise the subcounty
+// Relate the data to the population
+// A collapsible routing tab
+// Clustering using turf
+//

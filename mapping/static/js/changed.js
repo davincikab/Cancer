@@ -10,7 +10,7 @@ function highlightFeature(e){
 //============================= COLOR BREWER FILL COLORS ======================================
 function getColor(code){
  let color = ['#d73027','#f46d43','#fdae61','#fee08b','#ffffbf','#d9ef8b','#a6d96a','#66bd63','#1a9850'];
- return code < 25 ? '#ffffbf' : code < 30 ? '#fee08b' : code < 35 ? '#fdae61' : code < 40 ? '#f46d43' : '#d73027';
+ return code < 1 ? '#ffffbf' : code < 2.0 ? '#fee08b' : code < 3 ? '#fdae61' : code < 4 ? '#f46d43' : '#d73027';
  // return code < 25 ? '#d73027' : code < 30 ? '#f46d43' : code < 35 ? '#fdae61' : code < 40 ? '#fee08b' : '#ffffbf';
 }
 
@@ -158,12 +158,15 @@ function map_init(map, options){
        return L.marker(latlng,{});
      }});
 
-    var theat = L.heatLayer(pots,{
-            // radius:25,
-            // blur:15,
-            // gradient:{0.4: 'blue', 0.65: 'lime', 1: 'red'}
-          }).addTo(map);
 
+          var theat = new L.heatLayer(pots,{
+                  radius:15,
+                  max:1,
+                  minOpacity: 1,
+                  gradient: {0: '#fff5f0', 0.13: '#fee0d2', 0.26: '#fcbba1', 0.39: '#fc9272', 0.52: '#fb6a4a', 0.65: '#ef3b2c', 0.78: '#cb181d', 0.9: '#a50f15', 1: '#67000d'}
+                  // gradient: {0: '#fff5f0', 0.13: '#fee0d2', 0.26: '#fcbba1', 0.39: '#fc9272', 0.52: '#fb6a4a', 0.65: '#ef3b2c', 0.78: '#cb181d', 0.9: '#a50f15', 1: '#67000d'}
+                });
+// gradient:{0.1:"#ff333", 0.2:#ff1a1a, 0.3:#ff0000, 0.6: #e60000, 1:#cc0000}
 // ===================================== Consituency Layer =======================================================
    function resetHighlight(e){
      let layer = e.target;
@@ -204,9 +207,9 @@ function map_init(map, options){
    function myStyle(feature){
        return {
            "color":'#000000',
-           "weight":0.3,
-           "fillOpacity": 0.3,
-           // "fillColor": getColor(feature.properties.lukemia)
+           "weight":0.2,
+           "fillOpacity": 0.2,
+           "fillColor": getColor(feature.properties.lukemia)
        };
    }
 
@@ -228,7 +231,7 @@ function map_init(map, options){
        return div;
      }
 
-     legend.addTo(map);
+     // legend.addTo(map);
    }
 
  var const_data = L.geoJSON(null, {onEachFeature:onEachFeature,style:myStyle}).addTo(map);
@@ -246,18 +249,18 @@ function map_init(map, options){
 
      function loadData(time, data){
        const_data.addData(data);
-       updateStyle(time['year'][0]);
-
+       updateStyle(time['year'][1]);
      }
 
-     function updateStyle(time,type ='lukemia'){
+     function updateStyle(time,type ='others'){
        // change the column
-       console.log(type + ' '+  time);
        let values = [];
 
        const_data.eachLayer( layer => {
-         let fill = getColor(layer.feature.properties[type][time]);
-         values.push({name:layer.feature.properties.const_nam,y:layer.feature.properties[type][time]});
+         let data = layer.feature.properties.lung.filter( k=> Object.keys(k).indexOf(type) !=-1);
+         console.log(layer.feature.properties.lung);
+         let fill = getColor(data[0][type][time]);
+         values.push({name:layer.feature.properties.const_nam,y:data[0][type][time]});
          layer.setStyle({fillColor:fill,fillOpacity:0.8,color:'#000000',weight:1});
        });
 
@@ -282,7 +285,7 @@ function map_init(map, options){
                'step':1})
              .on('input change', function(){
                console.log($(this).val().toString());
-             updateFilter($(this).val().toString());
+             // updateFilter($(this).val().toString());
              updateStyle($(this).val().toString(),$('.c_type').val().toString());
              $('.temporal_legend').text($(this).val().toString());
          });
@@ -314,7 +317,7 @@ function map_init(map, options){
         var div = L.DomUtil.create('div','legend');
 
          div.innerHTML += '<p>Incidences</p>'
-         let labels = [24,29,34,39,44];
+         let labels = [1,2,3,4,5];
 
          for(let i=0; i< labels.length; i++){
            div.innerHTML+='<i style="background:'
@@ -356,19 +359,23 @@ function map_init(map, options){
        option.addTo(map);
      }
 
- let overlays = {'Patients':markercluster};
- let baselayer = {'Consituency':const_data,'Heatmap':theat};
+ let overlays = {'Patients':markercluster,'Heatmap':theat};
+ let baselayer = {'Consituency':const_data};
 
  L.control.layers(baselayer,overlays).addTo(map);
 
 }
 
 function  processData(data){
- let data_prop = Object.keys(data.features[0].properties.breast);
- let type = Object.keys(data.features[0].properties).filter(key =>
-   ["objectid", "const_nam", "const_no", "county_nam",  "total", "pk"].indexOf(key) == -1);
+ let type= [];
+ for (obj of data.features[0].properties.lung) {
+   type.push(Object.keys(obj).reduce(k=> k));
+ }
 
- return {'year':data_prop,'type':type};
+ // Object.keys(data.features[0].properties.breast); // Working with Sets
+ // data.features[0].properties.lung[0]['others']['2015']
+ let timestamps = Object.keys(data.features[0].properties.lung[0]['others']);
+ return {'year':timestamps,'type':type};
 }
 
 // Color the graph according to incidences reported

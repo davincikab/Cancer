@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block title %} List {% endblock %}
+{% block content %}
+
+<div class="container-fluid">
+  <form class="form-inline" action="{% url 'list-view' %}" method="get">
+    {% csrf_token %}
+    {{ data.form|crispy }}
+    <div class="input-group pt-3 ml-3">
+      <input type="submit" name="Submit" value="Submit" class="btn btn-success btn-sm">
+    </div>
+  </form>
+
+  <div class="container">
+    <table class="table table-responsive table-bordered">
+        <tr>
+          <th>Cancer</th>
+          <th>Age</th>
+          <th>Year</th>
+          <th>Gender</th>
+          <th>Cancer Stage</th>
+          <th>Chemotherapy</th>
+          <th>Status</th>
+          <th>Location</th>
+          <th>Sub County</th>
+          <th>County</th>
+        </tr>
+      <tbody>
+        {% for value in data.qs %}
+          <tr>
+            <td><a href="{% url 'detail-view' value.gid %}">{{value.cancer_typ |capfirst}}</a></td>
+            <td>{{value.age}}</td>
+            <td>{{value.year}}</td>
+            <td>{{value.gender}}</td>
+            <td>{{value.cancer_sta}}</td>
+            <td>{{value.chemothera}}</td>
+            <td>{{value.status}}</td>
+            <td>{{value.location|capfirst}}</td>
+            <td>{{value.const_nam}}</td>
+            <td>{{value.county_nam}}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+<!-- VISUALIZATION IN YEARS, CANCER TYPE, FOLLOW UP, -->

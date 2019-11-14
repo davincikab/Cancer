@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import *
+# from
 
 class PatientAdmin(admin.ModelAdmin):
     list_display = ['cancer_typ','gender','age','year']

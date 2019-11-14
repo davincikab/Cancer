@@ -45,11 +45,19 @@
       {% csrf_token %}
       <input type="number" name="year" value="" placeholder="Year">
     </form> -->
-    <div class="row bg-light mb-2" id="nhif_graph">
+    <!-- <div class="row">
+      <select class="form-control" name="" id="filter_data">
+
+      </select>
+    </div> -->
+    <div class="row bg-light mb-5" id="nhif_graph">
+
+    </div>
+    <div class="row bg-light mb-2" id="smap">
 
     </div>
     <div class="row" id="data_table">
-      <div class="col-md-6 ">
+      <div class="col-md-6 " id="">
         <div class="card table_analyst py-1">
           <h6>Cancer Type by Mode of Payment</h6>
           <table class="table table-responsive container ml-5 mt-2">
@@ -58,26 +66,9 @@
               <th>NHIF Card</th>
               <th>Medicare</th>
             </tr>
-            <tr>
-              <td>Prostate</td>
-              <td>20</td>
-              <td>10</td>
-            </tr>
-            <tr>
-              <td>Breast</td>
-              <td>20</td>
-              <td>10</td>
-            </tr>
-            <tr>
-              <td>Cervical</td>
-              <td>20</td>
-              <td>10</td>
-            </tr>
-            <tr>
-              <td>Others</td>
-              <td>20</td>
-              <td>10</td>
-            </tr>
+            <tbody>
+
+            </tbody>
           </table>
         </div>
       </div>
@@ -116,6 +107,11 @@
   <div class="col-md-6" id="pie_chart">
       <div class="row" id="line2"></div>
     <!-- Pie chart with a legend -->
+  </div>
+</div>
+<div class="row">
+  <div id="pyramid">
+
   </div>
 </div>
 

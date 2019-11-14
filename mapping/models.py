@@ -4,9 +4,9 @@ from django.contrib.auth.models import User
 
 class County(models.Model):
     gid = models.AutoField(primary_key=True)
-    objectid = models.DecimalField(max_digits=65535, decimal_places=65535, blank=False, null=False)
+    objectid = models.IntegerField(blank=False, null=False)
     const_nam = models.CharField(max_length=50, blank=False, null=False)
-    const_no = models.DecimalField(max_digits=65535, decimal_places=65535, blank=False, null=False)
+    const_no = models.IntegerField(blank=False, null=False)
     county_nam = models.CharField(max_length=50, blank=False, null=False)
     lukemia = JSONField(blank=False, null=False)
     cervical = JSONField(blank=False, null=False)
@@ -16,6 +16,7 @@ class County(models.Model):
     total = models.IntegerField(blank=False, null=False)
     geom = models.MultiPolygonField(blank=False, null=False)
     breast = JSONField(blank=False, null=False)
+    # incidence = models.TextField(blank = True,null=False)
 
     class Meta:
         managed = False
@@ -47,6 +48,7 @@ class Events(models.Model):
     date = models.DateTimeField()
     venue = models.CharField(max_length=30, blank = True)
     type = models.CharField(max_length=2, choices= event_choices)
+    location = models.PointField(srid=4326, blank = True, null=True)
 
     class Meta:
         db_table = 'mapping_events'
